@@ -1,0 +1,7 @@
+.Fourth.th:nth-child(1) {
+  width: 70%;
+}
+
+.Fourth.th:nth-child(2) {
+  width: 30%;
+}
