@@ -1,0 +1,31 @@
+/* react table header */
+.vendor-product-list{
+.product-list {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 280px;
+}
+
+/* common */
+.ReactTable .-header {
+  background: #f9f9f3;
+}
+
+.ReactTable .-header :hover {
+    background: #f9f9f3;
+}
+
+.margin-control {
+  .price-table {
+    text-align: left;
+    left: 10px;
+    position: relative;
+  }
+}
+}
+
+.product-button {
+  float: right;
+  padding-top: 15px;
+}

@@ -1,29 +1,41 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
-import './AddDevice.css';
+import './Sites.css';
 
-const AddDevice = () => {
+const City = () => {
   const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [region, setRegion] = useState("");
+  const [pincode, setPincode] = useState("");
   const [categories, setCategories] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name.trim() === "") return; // Fail proof: don't add empty names
+    if (city.trim() === "") return; // Fail proof: don't add empty names
     if (editingIndex === -1) {
-      setCategories([...categories, { name: name }]);
+      setCategories([...categories, { name: name ,  city: city , region: region, pincode: pincode}]);
     } else {
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].name = name;
+      updatedCategories[editingIndex].city = city;
+      updatedCategories[editingIndex].region = region;
+      updatedCategories[editingIndex].pincode = pincode;
       setCategories(updatedCategories);
       setEditingIndex(-1);
     }
     setName("");
+    setCity("");
+    setRegion("");
+    setPincode("");
   };
-
+console.log('categories',categories)
   const handleEdit = (index) => {
     setName(categories[index].name);
+    setCity(categories[index].city);
+    setRegion(categories[index].region);
+    setPincode(categories[index].pincode);
     setEditingIndex(index);
   };
 
@@ -42,10 +54,10 @@ const AddDevice = () => {
       <div className="row">
         <div className="col-md-4">
           <div className="card m-5" style={{ width: "18rem" }}>
-            <div className="card-header">Device Category</div>
+            <div className="card-header">City</div>
             <div className="card-body">
               <form onSubmit={handleSubmit}>
-                <label className="font-weight-bold" htmlFor="name">
+              <label className="font-weight-bold" htmlFor="city">
                   Name
                 </label>
                 <input
@@ -55,6 +67,42 @@ const AddDevice = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Name"
+                  required=""
+                />
+                <label className="font-weight-bold" htmlFor="city">
+                  City
+                </label>
+                <input
+                  className="form-control mt-3"
+                  type="text"
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="City"
+                  required=""
+                />
+                <label className="font-weight-bold" htmlFor="city">
+                  Region
+                </label>
+                <input
+                  className="form-control mt-3"
+                  type="text"
+                  id="region"
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  placeholder="Region"
+                  required=""
+                />
+                <label className="font-weight-bold" htmlFor="city">
+                  Pincode
+                </label>
+                <input
+                  className="form-control mt-3"
+                  type="text"
+                  id="Pincode"
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value)}
+                  placeholder="Pincode"
                   required=""
                 />
                 <div>
@@ -71,18 +119,20 @@ const AddDevice = () => {
         </div>
         <div className="col-md-8">
           <div className="card m-5">
-            <div className="card-header">Device Categories</div>
+            <div className="card-header">Sites List</div>
             <table className="table table-bordered">
               <thead>
                 <tr>
                   <th scope="col">Name</th>
-                  <th scope="col"></th>
+                  <th scope="col">City</th>
+                  <th scope="col">Region</th>
+                  <th scope="col">Pincode</th>
                 </tr>
               </thead>
               <tbody>
                 {categories.map((category, index) => (
                   <tr key={index}>
-                    <td>
+                      <td>
                       {editingIndex === index ? (
                         <input
                           type="text"
@@ -92,6 +142,42 @@ const AddDevice = () => {
                         />
                       ) : (
                         category.name
+                      )}
+                    </td>
+                    <td>
+                      {editingIndex === index ? (
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                        />
+                      ) : (
+                        category.city
+                      )}
+                    </td>
+                    <td>
+                      {editingIndex === index ? (
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={region}
+                          onChange={(e) => setRegion(e.target.value)}
+                        />
+                      ) : (
+                        category.region
+                      )}
+                    </td>
+                    <td>
+                      {editingIndex === index ? (
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={pincode}
+                          onChange={(e) => setPincode(e.target.value)}
+                        />
+                      ) : (
+                        category.pincode
                       )}
                     </td>
                     <td>
@@ -109,7 +195,7 @@ const AddDevice = () => {
                             className="btn btn-sm btn-secondary m-2"
                             onClick={() => setEditingIndex(-1)}
                           >
-                            <i class="fa-regular fa-message-slash"></i>
+                            <i class="fa-solid fa-ban"></i>
                           </button>
                         </>
                       ) : (
@@ -144,4 +230,4 @@ const AddDevice = () => {
   );
 };
 
-export default AddDevice;
+export default City;
