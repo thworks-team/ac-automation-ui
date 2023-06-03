@@ -42,7 +42,7 @@ const  DeviceType = () => {
       <div className="row">
         <div className="col-md-4">
           <div className="card m-5" style={{ width: "18rem" }}>
-            <div className="card-header">Device Category</div>
+            <div className="card-header">Device Type</div>
             <div className="card-body">
               <form onSubmit={handleSubmit}>
                 <label className="font-weight-bold" htmlFor="name">
@@ -71,7 +71,7 @@ const  DeviceType = () => {
         </div>
         <div className="col-md-8">
           <div className="card m-5">
-            <div className="card-header">Device Categories</div>
+            <div className="card-header">Device Type</div>
             <table className="table table-bordered">
               <thead>
                 <tr>

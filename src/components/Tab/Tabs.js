@@ -3,8 +3,8 @@ import Tabs from 'react-bootstrap/Tabs';
 import City from '../../pages/City/City';
 import DeviceCategory from '../../pages/DeviceCategory/DeviceCategory';
 import DeviceType from "../../pages/DeviceType/DeviceType";
-// import AddDevice from '../../pages/AddDevice/AddDevice';
-import SitesList from '../../pages/SitesList/Sites';
+import Gateway from '../../pages/Gateway/Gateway';
+// import SitesList from '../../pages/SitesList/Sites';
 import Sites from '../../pages/Sites/Sites';
 import Device from '../../pages/Device/Device';
 
@@ -32,7 +32,7 @@ const Main = () => {
       <DeviceType/>
       </Tab>
       <Tab eventKey="gateway" title="Gateway">
-        Tab content for Contact
+        <Gateway/>
       </Tab>
     </Tabs>
   );

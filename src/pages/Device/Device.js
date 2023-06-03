@@ -205,7 +205,7 @@ console.log('categories',categories)
         </div>
         <div className="col-md-8">
           <div className="card m-5">
-            <div className="card-header">Sites List</div>
+            <div className="card-header">Device List</div>
             <table className="table table-bordered">
               <thead>
                 <tr>
