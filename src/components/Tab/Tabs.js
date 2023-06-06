@@ -7,6 +7,7 @@ import Gateway from '../../pages/Gateway/Gateway';
 // import SitesList from '../../pages/SitesList/Sites';
 import Sites from '../../pages/Sites/Sites';
 import Device from '../../pages/Device/Device';
+import Schedules from '../../pages/Schedules/Schedules'
 
 const Main = () => {
   return (
@@ -22,17 +23,20 @@ const Main = () => {
       <Tab eventKey="sites" title="Sites">
         <Sites />
       </Tab>
+      <Tab eventKey="schedules" title="Schedules">
+        <Schedules />
+      </Tab>
       <Tab eventKey="device" title="Device">
         <Device />
       </Tab>
       <Tab eventKey="deviceCategory" title="Device Category">
-      <DeviceCategory />
+        <DeviceCategory />
       </Tab>
       <Tab eventKey="deviceType" title="Device Type">
-      <DeviceType/>
+        <DeviceType />
       </Tab>
       <Tab eventKey="gateway" title="Gateway">
-        <Gateway/>
+        <Gateway />
       </Tab>
     </Tabs>
   );
