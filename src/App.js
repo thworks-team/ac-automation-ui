@@ -12,6 +12,8 @@ import Gateway from './pages/Gateway/Gateway';
 import Sites from './pages/Sites/Sites';
 import Device from './pages/Device/Device';
 import Schedules from './pages/Schedules/Schedules';
+import Login from './pages/Login/Login';
+
 
 export default function App() {
   return (
@@ -19,6 +21,7 @@ export default function App() {
     <Header/>
       <Routes>
         <Route path="/" element={<Schedules />}/>
+        <Route path="/login" element={<Login />}/>
         <Route path="/schedules" element={<Schedules />}/>
         <Route path="/city" element={<City />}/>
         <Route path="/device-category" element={<DeviceCategory />}/>
