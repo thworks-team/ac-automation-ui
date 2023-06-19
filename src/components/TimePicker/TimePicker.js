@@ -1,7 +1,22 @@
-import React from 'react'
-import { AiOutlineClockCircle } from 'react-icons/ai';
+import React, {useState} from 'react'
 
-const TimePicker = () => {
+
+const TimePicker = ({handleSelectedTime}) => {
+
+  const handleStartTime = () => {
+    let startTime = document.getElementById('startTime').value;
+    handleSelectedTime('startTime',startTime)
+  }
+
+  const handleEndTime = () => {
+    let endTime = document.getElementById('endTime').value;
+    handleSelectedTime('endTime',endTime)
+  }
+
+  const handleRangeSelector = event => {
+    
+  }
+
   return (
     <div>
       <div className="row m-1">
@@ -11,15 +26,15 @@ const TimePicker = () => {
         <div className="m-2 col-sm-2">
           <label for="basic-url" className="form-label">Start Time</label>
           <div className="input-group">
-            <input type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4" placeholder="9:00" />
-            <span className="input-group-text" id="basic-addon3"><AiOutlineClockCircle /></span>
+            <input type="time" className="form-control" id="startTime" aria-describedby="basic-addon3 basic-addon4"  onChange={handleStartTime} />
+            {/* <span className="input-group-text" id="basic-addon3"><AiOutlineClockCircle /></span> */}
           </div>
         </div>
         <div className="m-2 col-sm-2">
           <label for="basic-url" className="form-label">End Time</label>
           <div className="input-group">
-            <input type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4" placeholder="9:00" />
-            <span className="input-group-text" id="basic-addon3"><AiOutlineClockCircle /></span>
+            <input type="time" className="form-control" id="endTime" aria-describedby="basic-addon3 basic-addon4"  onChange={handleEndTime} />
+            {/* <span className="input-group-text" id="basic-addon3"><AiOutlineClockCircle /></span> */}
           </div>
         </div>
         <div className="form-check form-switch m-2 col-sm-1">
@@ -28,7 +43,7 @@ const TimePicker = () => {
         </div>
         <div className="m-2 col-sm-3">
           <label for="customRange2" className="form-label">Temperature</label>
-          <input type="range" className="form-range" min="0" max="5" id="customRange2"></input>
+          <input type="range" className="form-range" min="18" max="26" id="customRange2" onChange={(ev) => handleRangeSelector(ev)}></input>
         </div>
       </div>
     </div>

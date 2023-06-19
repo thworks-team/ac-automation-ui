@@ -1,0 +1,12 @@
+.customDatePicker{
+    min-width: 4rem;
+    min-height: 1rem;
+    padding: 5%;
+    border-radius: 5%;
+    background: transparent;
+    border: yellow;
+}
+
+.reactDatePickerWrapper{
+    width: 30%;
+}

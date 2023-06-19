@@ -44,6 +44,7 @@ const Device = () => {
         setImei(categories[index].imei);
         setSite(categories[index].site);
         setGatewayType(categories[index].gateway);
+        setEditingIndex(index)
     };
 
     const handleDelete = (index) => {
@@ -73,7 +74,7 @@ const Device = () => {
                                             className="form-control mt-3"
                                             type="text"
                                             id="name"
-                                            value={name}
+                                            value={editingIndex === -1 ? name : null}
                                             onChange={(e) => setName(e.target.value)}
                                             placeholder="Name"
                                             required=""
@@ -87,7 +88,7 @@ const Device = () => {
                                             className="form-control mt-3"
                                             type="text"
                                             id="code"
-                                            value={code}
+                                            value={editingIndex === -1 ? code : null}
                                             onChange={(e) => setCode(e.target.value)}
                                             placeholder="Code"
                                             required=""
@@ -101,7 +102,7 @@ const Device = () => {
                                             className="form-control mt-3"
                                             type="text"
                                             id="mac"
-                                            value={mac}
+                                            value={editingIndex === -1 ? mac : null}
                                             onChange={(e) => setMac(e.target.value)}
                                             placeholder="MAC"
                                             required=""
@@ -115,7 +116,7 @@ const Device = () => {
                                             className="form-control mt-3"
                                             type="text"
                                             id="imei"
-                                            value={imei}
+                                            value={editingIndex === -1 ? imei : null}
                                             onChange={(e) => setImei(e.target.value)}
                                             placeholder="IMEI (GSM)"
                                             required=""
@@ -129,7 +130,7 @@ const Device = () => {
                                             className="form-control mt-3"
                                             type="text"
                                             id="name"
-                                            value={site}
+                                            value={editingIndex === -1 ? site : null}
                                             onChange={(e) => setSite(e.target.value)}
                                             placeholder="Site"
                                             required=""
@@ -143,7 +144,7 @@ const Device = () => {
                                             className="form-control mt-3"
                                             type="text"
                                             id="gateway"
-                                            value={gateway}
+                                            value={editingIndex === -1 ? gateway : null}
                                             onChange={(e) => setGatewayType(e.target.value)}
                                             placeholder="Gateway Type"
                                             required=""
@@ -155,7 +156,7 @@ const Device = () => {
                                         type="submit"
                                         className="btn btn-primary m-3 mx-4 px-4"
                                     >
-                                        {editingIndex === -1 ? "Add" : "Save"}
+                                        {"Add"}
                                     </button>
                                 </div>
                             </form>
