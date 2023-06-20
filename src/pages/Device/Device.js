@@ -2,36 +2,74 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import './Device.css';
-import { getRequest } from "../../utils/apiHelper";
+import { getRequest, postRequest } from "../../utils/apiHelper";
 
 const Device = () => {
-  const [deviceType, setDeviceType] = useState("");
-  const [gateway, setGateway] = useState("");
+  const [device, setDevice] = useState("");
+  const [deviceType, setDeviceType] = useState([]);
+  const [selectedDeviceType, setSelectedDeviceType] = useState("");
+  const [gateway, setGateway] = useState([]);
+  const [selectedGateway, setSelectedGateway] = useState("");
   const [nodeId, setNodeId] = useState("");
-  const [deviceCategory, setDeviceCategory] = useState("");
+  const [deviceCategory, setDeviceCategory] = useState([]);
+  const [selectedDeviceCategory, setSelectedDeviceCategory] = useState("");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  const [schedule, setSchedule] = useState("");
+  const [schedule, setSchedule] = useState([]);
+  const [selectedSchedule, setSelectedSchedule] = useState("6491da395d6666bc1c78e2cd");
   const [brandModel, setBrandModel] = useState("");
   const [categories, setCategories] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      const response = await getRequest('/device');
-      setLoading(false);
-      setCategories(response.data.data);
-    }
-    fetchData();
-  },[])
+    if (!loading) {
+      async function fetchData() {
+        setLoading(true);
+        // const res = await Promise.all([
+        //   getRequest('/device'),
+        //   getRequest('/deviceType'),
+        //   getRequest('/deviceCategory'),
+        //   getRequest('/gateway'),
+        //   getRequest('/schedule'),
+        // ]);
+        // const data = res.map((res) => res.data.data);
+        // console.log(data.flat());
 
-  const handleSubmit = (e) => {
+        const deviceResponse = await getRequest('/device');
+        const deviceTypeResponse = await getRequest('/deviceType');
+        const deviceCategoryResponse = await getRequest('/deviceCategory');
+        const gatewayResponse = await getRequest('/gateway');
+        // const scheduleResponse = await getRequest('/schedule');
+        setDeviceType(deviceTypeResponse.data.data)
+        setDeviceCategory(deviceCategoryResponse.data.data)
+        setGateway(gatewayResponse.data.data)
+        // setSchedule(scheduleResponse.data.data)
+        setLoading(false);
+        setCategories(deviceResponse.data.data);
+      }
+      fetchData();
+    }
+  }, [])
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
     // if (city.trim() === "") return; // Fail proof: don't add empty names
     if (editingIndex === -1) {
-      setCategories([...categories, { deviceType: deviceType, gateway : gateway, nodeId: nodeId, deviceCategory: deviceCategory,  name: name ,  location: location , schedule: schedule, brandModel: brandModel}]);
+      let data = {
+        deviceTypeId: selectedDeviceType,
+        deviceCategoryId: selectedDeviceCategory ,
+        nodeId: nodeId,
+        gatewayId: setSelectedGateway, 
+        name: name,
+        location: location,
+        scheduleId: selectedSchedule,
+        brandModel: brandModel 
+    }
+    setLoading(true);
+    const response = await postRequest('/device', data);
+    setLoading(false);
+    setCategories([...categories, response.data.data]);
     } else {
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].deviceType = deviceType;
@@ -54,7 +92,7 @@ const Device = () => {
     setSchedule("");
     setBrandModel("");
   };
-console.log('categories',categories)
+
   const handleEdit = (index) => {
     setDeviceType(categories[index].deviceType);
     setGateway(categories[index].gateway);
@@ -83,7 +121,7 @@ console.log('categories',categories)
 
   return (
     <div className="main">
-      {loading ? 
+      {loading ?
         <div class="text-center mt-4">
           <span >Loading...</span>
           <div class="spinner-border" role="status">
@@ -96,12 +134,12 @@ console.log('categories',categories)
               <div className="card-header">Add Device</div>
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
-                <div className="row">
-                <div className="col-md-6">
-                <label className="font-weight-bold" htmlFor="city">
-                    Device Type
-                  </label>
-                  <input
+                  <div className="row">
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Device Type
+                      </label>
+                      {/* <input
                     className="form-control mt-3"
                     type="text"
                     id="deviceType"
@@ -109,13 +147,19 @@ console.log('categories',categories)
                     onChange={(e) => setDeviceType(e.target.value)}
                     placeholder="Device Type"
                     required=""
-                  />
-                  </div>
-                  <div className="col-md-6">
-                  <label className="font-weight-bold" htmlFor="city">
-                    Gateway
-                  </label>
-                  <input
+                  /> */}
+                      {console.log('dtt', deviceType)}
+                      <select class="form-select" id="city" aria-label="Default select example" onChange={(e) => setSelectedDeviceType(e.target.value)}>
+                        {deviceType?.map((item,index) => {
+                          return <option selected={index === 0} value={item['_id']}>{item.name}</option>
+                        })}
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Gateway
+                      </label>
+                      {/* <input
                     className="form-control mt-3"
                     type="text"
                     id="gateway"
@@ -123,92 +167,102 @@ console.log('categories',categories)
                     onChange={(e) => setGateway(e.target.value)}
                     placeholder="Gateway"
                     required=""
-                  />
-                  </div>
-                  <div className="col-md-6">
-                  <label className="font-weight-bold" htmlFor="city">
-                    Node-Id
-                  </label>
-                  <input
-                    className="form-control mt-3"
-                    type="text"
-                    id="nodeId"
-                    value={editingIndex === -1 ? nodeId : null}
-                    onChange={(e) => setNodeId(e.target.value)}
-                    placeholder="Node-Id"
-                    required=""
-                  />
-                  </div>
-                  <div className="col-md-6">
-                  <label className="font-weight-bold" htmlFor="city">
-                    Device Category
-                  </label>
-                  <input
-                    className="form-control mt-3"
-                    type="text"
-                    id="deviceCategory"
-                    value={editingIndex === -1 ? deviceCategory : null}
-                    onChange={(e) => setDeviceCategory(e.target.value)}
-                    placeholder="Device Category"
-                    required=""
-                  />
-                      </div>
-                  <div className="col-md-6">
-                  <label className="font-weight-bold" htmlFor="city">
-                    Name
-                  </label>
-                  <input
-                    className="form-control mt-3"
-                    type="text"
-                    id="name"
-                    value={editingIndex === -1 ? name : null}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Name"
-                    required=""
-                  />
-                  </div>
-                  <div className="col-md-6">
-                  <label className="font-weight-bold" htmlFor="city">
-                  Location
-                  </label>
-                  <input
-                    className="form-control mt-3"
-                    type="text"
-                    id="location"
-                    value={editingIndex === -1 ? location : null}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Location"
-                    required=""
-                  />
-                  </div>
-                  <div className="col-md-6">
-                  <label className="font-weight-bold" htmlFor="city">
-                  Schedule
-                  </label>
-                  <input
-                    className="form-control mt-3"
-                    type="text"
-                    id="schedule"
-                    value={editingIndex === -1 ? schedule : null}
-                    onChange={(e) => setSchedule(e.target.value)}
-                    placeholder="Schedule"
-                    required=""
-                  />
-                  </div>
-                  <div className="col-md-6">
-                  <label className="font-weight-bold" htmlFor="city">
-                  Brand Model
-                  </label>
-                  <input
-                    className="form-control mt-3"
-                    type="text"
-                    id=" brandModel"
-                    value={editingIndex === -1 ? brandModel : null}
-                    onChange={(e) => setBrandModel(e.target.value)}
-                    placeholder=" Brand Model"
-                    required=""
-                  />
-                  </div>
+                  /> */}
+                      <select class="form-select" id="city" aria-label="Default select example" onChange={(e) => setSelectedGateway(e.target.value)}>
+                        {gateway?.map(item => {
+                          return <option value={item['_id']}>{item.name}</option>
+                        })}
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Node-Id
+                      </label>
+                      <input
+                        className="form-control mt-3"
+                        type="text"
+                        id="nodeId"
+                        value={editingIndex === -1 ? nodeId : null}
+                        onChange={(e) => setNodeId(e.target.value)}
+                        placeholder="Node-Id"
+                        required=""
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Device Category
+                      </label>
+                      {/* <input
+                        className="form-control mt-3"
+                        type="text"
+                        id="deviceCategory"
+                        value={editingIndex === -1 ? deviceCategory : null}
+                        onChange={(e) => setDeviceCategory(e.target.value)}
+                        placeholder="Device Category"
+                        required=""
+                      /> */}
+                      <select class="form-select  mt-3" id="city" aria-label="Default select example" onChange={(e) => setSelectedDeviceCategory(e.target.value)}>
+                        {deviceCategory?.map(item => {
+                          return <option value={item['_id']}>{item.name}</option>
+                        })}
+                      </select>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Name
+                      </label>
+                      <input
+                        className="form-control mt-3"
+                        type="text"
+                        id="name"
+                        value={editingIndex === -1 ? name : null}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Name"
+                        required=""
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Location
+                      </label>
+                      <input
+                        className="form-control mt-3"
+                        type="text"
+                        id="location"
+                        value={editingIndex === -1 ? location : null}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="Location"
+                        required=""
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Schedule
+                      </label>
+                      <input
+                        className="form-control mt-3"
+                        type="text"
+                        id="schedule"
+                        value={editingIndex === -1 ? schedule : null}
+                        onChange={(e) => setSchedule(e.target.value)}
+                        placeholder="Schedule"
+                        required=""
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="font-weight-bold" htmlFor="city">
+                        Brand Model
+                      </label>
+                      <input
+                        className="form-control mt-3"
+                        type="text"
+                        id=" brandModel"
+                        value={editingIndex === -1 ? brandModel : null}
+                        onChange={(e) => setBrandModel(e.target.value)}
+                        placeholder=" Brand Model"
+                        required=""
+                      />
+                    </div>
                   </div>
                   <div>
                     <button
@@ -241,7 +295,6 @@ console.log('categories',categories)
                 <tbody>
                   {categories.map((category, index) => (
                     <tr key={index}>
-                    {console.log(editingIndex,index)}
                       <td>
                         {editingIndex === index ? (
                           <input
@@ -251,7 +304,7 @@ console.log('categories',categories)
                             onChange={(e) => setDeviceType(e.target.value)}
                           />
                         ) : (
-                          category.deviceType
+                          deviceType.find(item => item['_id'] === category.deviceTypeId)?.name
                         )}
                       </td>
                       <td>
@@ -263,7 +316,7 @@ console.log('categories',categories)
                             onChange={(e) => setGateway(e.target.value)}
                           />
                         ) : (
-                          category.gateway
+                          gateway.find(item => item['_id'] === category.gatewayId)?.name
                         )}
                       </td>
                       <td>
@@ -287,7 +340,8 @@ console.log('categories',categories)
                             onChange={(e) => setDeviceCategory(e.target.value)}
                           />
                         ) : (
-                          category.deviceCategory
+                          // category.deviceCategory
+                          deviceCategory.find(item => item['_id'] === category.deviceCategoryId)?.name
                         )}
                       </td>
                       <td>

@@ -39,7 +39,8 @@ const City = () => {
     } else {
       let id = categories[editingIndex]['_id'];
       setLoading(true);
-      const response = await patchRequest(`/sites/${id}`,{ name: name, city: selectedCity, region: region, pincode: pincode});
+      const response = await postRequest(`/sites/${id}`,{ name: name, city: selectedCity, region: region, pincode: pincode});
+      setLoading(false);
       console.log(response);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].name = name;
@@ -65,7 +66,7 @@ const City = () => {
 
   const handleDelete = async(index,category) => {
     setLoading(true);
-    await deleteRequest(`/sites/delete/${category['_id']}`);
+    await postRequest(`/sites/delete/${category['_id']}`,{});
     setLoading(false);
     const updatedCategories = categories.filter((_, i) => i !== index);
     setCategories(updatedCategories);
@@ -207,8 +208,8 @@ const City = () => {
                             })}
                           </select>
                         ) : (
-                          category.city
-                        )}
+                          city.find(item => item['_id'] === category.city)?.name
+                          )}
                       </td>
                       <td>
                         {editingIndex === index ? (

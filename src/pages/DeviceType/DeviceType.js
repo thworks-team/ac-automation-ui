@@ -1,19 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import './DeviceType.css';
+import { getRequest, postRequest } from "../../utils/apiHelper";
 
 const  DeviceType = () => {
   const [name, setName] = useState("");
   const [categories, setCategories] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const response = await getRequest('/deviceType');
+      setLoading(false);
+      setCategories(response.data.data);
+    }
+    fetchData();
+  },[])
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (name.trim() === "") return; // Fail proof: don't add empty names
     if (editingIndex === -1) {
-      setCategories([...categories, { name: name }]);
+      setLoading(true);
+      const response = await postRequest('/deviceType',{ name: name });
+      setLoading(false);
+      setCategories([...categories, response.data.data]);
     } else {
+      let id = categories[editingIndex]['_id'];
+      setLoading(true);
+      const response = await postRequest(`/deviceType/${id}`,{ name: name });
+      console.log(response);
+      setLoading(false);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].name = name;
       setCategories(updatedCategories);
@@ -27,7 +47,10 @@ const  DeviceType = () => {
     setEditingIndex(index);
   };
 
-  const handleDelete = (index) => {
+  const handleDelete = async(index,category) => {
+    setLoading(true);
+    await postRequest(`/deviceType/delete/${category['_id']}`,{});
+    setLoading(false);
     const updatedCategories = categories.filter((_, i) => i !== index);
     setCategories(updatedCategories);
     if (editingIndex === index) {
@@ -39,6 +62,14 @@ const  DeviceType = () => {
 
   return (
     <div className="main">
+      {
+        loading ? 
+        <div class="text-center mt-4">
+          <span >Loading...</span>
+          <div class="spinner-border" role="status">
+          </div>
+        </div>
+        :
       <div className="row">
         <div className="col-md-4">
           <div className="card m-5" style={{ width: "18rem" }}>
@@ -52,7 +83,7 @@ const  DeviceType = () => {
                   className="form-control mt-3"
                   type="text"
                   id="name"
-                  value={name}
+                  value={editingIndex === -1 ? name : null}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Name"
                   required=""
@@ -62,7 +93,7 @@ const  DeviceType = () => {
                     type="submit"
                     className="btn btn-primary m-3 mx-4 px-4"
                   >
-                    {editingIndex === -1 ? "Add" : "Save"}
+                    {"Add" }
                   </button>
                 </div>
               </form>
@@ -125,7 +156,7 @@ const  DeviceType = () => {
                           <button
                             type="button"
                             className="btn btn-sm btn-danger m-2"
-                            onClick={() => handleDelete(index)}
+                            onClick={() => handleDelete(index,category)}
                             disabled={editingIndex !== -1}
                           >
                             <i class="fa-solid fa-xmark"></i>
@@ -140,6 +171,7 @@ const  DeviceType = () => {
           </div>
         </div>
       </div>
+      }
     </div>
   );
 };

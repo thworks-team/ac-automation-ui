@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import './DeviceCategory.css';
-import { getRequest } from "../../utils/apiHelper";
+import { getRequest, postRequest } from "../../utils/apiHelper";
 
 const DeviceCategory = () => {
   const [name, setName] = useState("");
@@ -20,12 +20,20 @@ const DeviceCategory = () => {
     fetchData();
   },[])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (name.trim() === "") return; // Fail proof: don't add empty names
     if (editingIndex === -1) {
-      setCategories([...categories, { name: name }]);
+      setLoading(true);
+      const response = await postRequest('/deviceCategory',{ name: name });
+      setLoading(false);
+      setCategories([...categories, response.data.data]);
     } else {
+      let id = categories[editingIndex]['_id'];
+      setLoading(true);
+      const response = await postRequest(`/deviceCategory/${id}`,{ name: name });
+      console.log(response);
+      setLoading(false);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].name = name;
       setCategories(updatedCategories);
@@ -39,7 +47,10 @@ const DeviceCategory = () => {
     setEditingIndex(index);
   };
 
-  const handleDelete = (index) => {
+  const handleDelete = async(index,category) => {
+    setLoading(true);
+    await postRequest(`/deviceCategory/delete/${category['_id']}`,{});
+    setLoading(false);
     const updatedCategories = categories.filter((_, i) => i !== index);
     setCategories(updatedCategories);
     if (editingIndex === index) {
@@ -144,7 +155,7 @@ const DeviceCategory = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-danger m-2"
-                              onClick={() => handleDelete(index)}
+                              onClick={() => handleDelete(index,category)}
                               disabled={editingIndex !== -1}
                             >
                               <i class="fa-solid fa-xmark"></i>

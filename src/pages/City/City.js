@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import './City.css';
-import {deleteRequest, getRequest, patchRequest, postRequest} from './../../utils/apiHelper';
+import { getRequest, postRequest} from './../../utils/apiHelper';
 const City = () => {
   const [loading, setLoading] = useState(false);
   const [city, setCity] = useState("");
@@ -135,7 +135,6 @@ const City = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {console.log('categories',categories)}
                   {categories.map((category, index) => (
                     <tr key={index}>
                       <td>
