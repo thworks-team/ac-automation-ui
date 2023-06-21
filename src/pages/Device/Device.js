@@ -7,17 +7,17 @@ import { getRequest, postRequest } from "../../utils/apiHelper";
 const Device = () => {
   const [device, setDevice] = useState("");
   const [deviceType, setDeviceType] = useState([]);
-  const [selectedDeviceType, setSelectedDeviceType] = useState("");
+  const [selectedDeviceType, setSelectedDeviceType] = useState(null);
   const [gateway, setGateway] = useState([]);
-  const [selectedGateway, setSelectedGateway] = useState("");
-  const [nodeId, setNodeId] = useState("");
+  const [selectedGateway, setSelectedGateway] = useState(null);
+  const [nodeId, setNodeId] = useState(null);
   const [deviceCategory, setDeviceCategory] = useState([]);
-  const [selectedDeviceCategory, setSelectedDeviceCategory] = useState("");
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
+  const [selectedDeviceCategory, setSelectedDeviceCategory] = useState(null);
+  const [name, setName] = useState(null);
+  const [location, setLocation] = useState(null);
   const [schedule, setSchedule] = useState([]);
-  const [selectedSchedule, setSelectedSchedule] = useState("6491da395d6666bc1c78e2cd");
-  const [brandModel, setBrandModel] = useState("");
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [brandModel, setBrandModel] = useState(null);
   const [categories, setCategories] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
@@ -40,11 +40,11 @@ const Device = () => {
         const deviceTypeResponse = await getRequest('/deviceType');
         const deviceCategoryResponse = await getRequest('/deviceCategory');
         const gatewayResponse = await getRequest('/gateway');
-        // const scheduleResponse = await getRequest('/schedule');
+        const scheduleResponse = await getRequest('/schedule');
         setDeviceType(deviceTypeResponse.data.data)
         setDeviceCategory(deviceCategoryResponse.data.data)
         setGateway(gatewayResponse.data.data)
-        // setSchedule(scheduleResponse.data.data)
+        setSchedule(scheduleResponse.data.data)
         setLoading(false);
         setCategories(deviceResponse.data.data);
       }
@@ -52,55 +52,60 @@ const Device = () => {
     }
   }, [])
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // if (city.trim() === "") return; // Fail proof: don't add empty names
-    if (editingIndex === -1) {
-      let data = {
-        deviceTypeId: selectedDeviceType,
-        deviceCategoryId: selectedDeviceCategory ,
-        nodeId: nodeId,
-        gatewayId: setSelectedGateway, 
-        name: name,
-        location: location,
-        scheduleId: selectedSchedule,
-        brandModel: brandModel 
+    let data = {
+      deviceTypeId: selectedDeviceType,
+      deviceCategoryId: selectedDeviceCategory,
+      nodeId: nodeId,
+      gatewayId: selectedGateway,
+      name: name,
+      location: location,
+      scheduleId: selectedSchedule,
+      brandModel: brandModel
     }
-    setLoading(true);
-    const response = await postRequest('/device', data);
-    setLoading(false);
-    setCategories([...categories, response.data.data]);
+    if (editingIndex === -1) {
+      setLoading(true);
+      const response = await postRequest('/device', data);
+      setLoading(false);
+      setCategories([...categories, response.data.data]);
     } else {
+      let id = categories[editingIndex]['_id'];
+      setLoading(true);
+      const response = await postRequest(`/device/${id}`,data);
+      setLoading(false);
+      console.log(response);
       const updatedCategories = [...categories];
-      updatedCategories[editingIndex].deviceType = deviceType;
-      updatedCategories[editingIndex].gateway = gateway;
+      updatedCategories[editingIndex].deviceTypeId = selectedDeviceType;
+      updatedCategories[editingIndex].gatewayId = selectedGateway;
       updatedCategories[editingIndex].nodeId = nodeId;
-      updatedCategories[editingIndex].deviceCategory = deviceCategory;
+      updatedCategories[editingIndex].deviceCategoryId = selectedDeviceCategory;
       updatedCategories[editingIndex].name = name;
       updatedCategories[editingIndex].location = location;
-      updatedCategories[editingIndex].schedule = schedule;
+      updatedCategories[editingIndex].scheduleId = selectedSchedule;
       updatedCategories[editingIndex].brandModel = brandModel;
       setCategories(updatedCategories);
       setEditingIndex(-1);
     }
-    setDeviceType("");
-    setGateway("");
+    setSelectedDeviceType("");
+    setSelectedGateway("");
     setNodeId("");
-    setDeviceCategory("");
+    setSelectedDeviceCategory("");
     setName("");
     setLocation("");
-    setSchedule("");
+    setSelectedSchedule("");
     setBrandModel("");
   };
 
   const handleEdit = (index) => {
-    setDeviceType(categories[index].deviceType);
-    setGateway(categories[index].gateway);
+    setSelectedDeviceType(categories[index].deviceType);
+    setSelectedGateway(categories[index].gateway);
     setNodeId(categories[index].nodeId);
-    setDeviceCategory(categories[index].deviceCategory);
+    setSelectedDeviceCategory(categories[index].deviceCategory);
     setName(categories[index].name);
     setLocation(categories[index].location);
-    setSchedule(categories[index].schedule);
+    setSelectedSchedule(categories[index].schedule);
     setBrandModel(categories[index].brandModel);
     // setName(categories[index].name);
     // setCity(categories[index].city);
@@ -109,7 +114,10 @@ const Device = () => {
     setEditingIndex(index);
   };
 
-  const handleDelete = (index) => {
+  const handleDelete = async(index,category) => {
+    setLoading(true);
+    await postRequest(`/device/delete/${category['_id']}`,{});
+    setLoading(false);
     const updatedCategories = categories.filter((_, i) => i !== index);
     setCategories(updatedCategories);
     if (editingIndex === index) {
@@ -118,6 +126,14 @@ const Device = () => {
       setEditingIndex(editingIndex - 1);
     }
   };
+
+  const enableSubmit = () => {
+    let enable = true;
+    if (selectedDeviceCategory && selectedDeviceType && selectedGateway && selectedSchedule && name && location && nodeId && brandModel) {
+      enable = false;
+    }
+    return enable;
+  }
 
   return (
     <div className="main">
@@ -148,10 +164,10 @@ const Device = () => {
                     placeholder="Device Type"
                     required=""
                   /> */}
-                      {console.log('dtt', deviceType)}
-                      <select class="form-select" id="city" aria-label="Default select example" onChange={(e) => setSelectedDeviceType(e.target.value)}>
-                        {deviceType?.map((item,index) => {
-                          return <option selected={index === 0} value={item['_id']}>{item.name}</option>
+                      <select class="form-select" id="city" required onChange={(e) => setSelectedDeviceType(e.target.value)}>
+                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Device Type --</option>
+                        {deviceType?.map((item, index) => {
+                          return <option value={item['_id']}>{item.name}</option>
                         })}
                       </select>
                     </div>
@@ -168,7 +184,8 @@ const Device = () => {
                     placeholder="Gateway"
                     required=""
                   /> */}
-                      <select class="form-select" id="city" aria-label="Default select example" onChange={(e) => setSelectedGateway(e.target.value)}>
+                      <select class="form-select" id="city" onChange={(e) => setSelectedGateway(e.target.value)}>
+                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Gateway --</option>
                         {gateway?.map(item => {
                           return <option value={item['_id']}>{item.name}</option>
                         })}
@@ -201,7 +218,8 @@ const Device = () => {
                         placeholder="Device Category"
                         required=""
                       /> */}
-                      <select class="form-select  mt-3" id="city" aria-label="Default select example" onChange={(e) => setSelectedDeviceCategory(e.target.value)}>
+                      <select class="form-select  mt-3" id="city" onChange={(e) => setSelectedDeviceCategory(e.target.value)}>
+                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Device Category --</option>
                         {deviceCategory?.map(item => {
                           return <option value={item['_id']}>{item.name}</option>
                         })}
@@ -239,15 +257,21 @@ const Device = () => {
                       <label className="font-weight-bold" htmlFor="city">
                         Schedule
                       </label>
-                      <input
+                      <select class="form-select mt-3" id="city" required onChange={(e) => setSelectedSchedule(e.target.value)}>
+                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Schedule -- </option>
+                        {schedule?.map((item, index) => {
+                          return <option value={item['_id']}>{item.name}</option>
+                        })}
+                      </select>
+                      {/* <input
                         className="form-control mt-3"
                         type="text"
                         id="schedule"
-                        value={editingIndex === -1 ? schedule : null}
+                        value={editingIndex === -1 ? selectedSchedule : null}
                         onChange={(e) => setSchedule(e.target.value)}
                         placeholder="Schedule"
                         required=""
-                      />
+                      /> */}
                     </div>
                     <div className="col-md-6">
                       <label className="font-weight-bold" htmlFor="city">
@@ -268,6 +292,7 @@ const Device = () => {
                     <button
                       type="submit"
                       className="btn btn-primary m-3 mx-4 px-4"
+                      disabled={enableSubmit()}
                     >
                       {"Add"}
                     </button>
@@ -297,26 +322,26 @@ const Device = () => {
                     <tr key={index}>
                       <td>
                         {editingIndex === index ? (
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={deviceType}
-                            onChange={(e) => setDeviceType(e.target.value)}
-                          />
+                          <select class="form-select" id="city" required onChange={(e) => setSelectedDeviceType(e.target.value)}>
+                            {deviceType?.map((item, index) => {
+                              return <option selected={item['_id'] === category?.deviceCategoryId['_id']} value={item['_id']}>{item.name}</option>
+                            })}
+                          </select>
                         ) : (
-                          deviceType.find(item => item['_id'] === category.deviceTypeId)?.name
+                          // deviceType.find(item => item['_id'] === category.deviceTypeId)?.name
+                          category.deviceTypeId?.name
                         )}
                       </td>
                       <td>
                         {editingIndex === index ? (
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={gateway}
-                            onChange={(e) => setGateway(e.target.value)}
-                          />
+                          <select class="form-select" id="city" onChange={(e) => setSelectedGateway(e.target.value)}>
+                            {gateway?.map(item => {
+                              return <option selected={item['_id'] === category?.gatewayId['_id']} value={item['_id']}>{item.name}</option>
+                            })}
+                          </select>
                         ) : (
-                          gateway.find(item => item['_id'] === category.gatewayId)?.name
+                          // gateway.find(item => item['_id'] === category.gatewayId)?.name
+                          category.gatewayId?.name
                         )}
                       </td>
                       <td>
@@ -333,15 +358,14 @@ const Device = () => {
                       </td>
                       <td>
                         {editingIndex === index ? (
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={deviceCategory}
-                            onChange={(e) => setDeviceCategory(e.target.value)}
-                          />
+                          <select class="form-select  mt-3" id="city" onChange={(e) => setSelectedDeviceCategory(e.target.value)}>
+                            {deviceCategory?.map(item => {
+                              return <option selected={item['_id'] === category?.deviceCategoryId['_id']} value={item['_id']}>{item.name}</option>
+                            })}
+                          </select>
                         ) : (
-                          // category.deviceCategory
-                          deviceCategory.find(item => item['_id'] === category.deviceCategoryId)?.name
+                          category.deviceCategoryId?.name
+                          // deviceCategory.find(item => item['_id'] === category.deviceCategoryId)?.name
                         )}
                       </td>
                       <td>
@@ -370,14 +394,13 @@ const Device = () => {
                       </td>
                       <td>
                         {editingIndex === index ? (
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={schedule}
-                            onChange={(e) => setSchedule(e.target.value)}
-                          />
+                          <select class="form-select mt-3" id="city" required onChange={(e) => setSelectedSchedule(e.target.value)}>
+                            {schedule?.map((item, index) => {
+                              return <option selected={item['_id'] === category?.deviceCategoryId['_id']} value={item['_id']}>{item.name}</option>
+                            })}
+                          </select>
                         ) : (
-                          category.schedule
+                          schedule.find(item => item['_id'] === category.scheduleId)?.name
                         )}
                       </td>
                       <td>
@@ -423,7 +446,7 @@ const Device = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-danger m-2"
-                              onClick={() => handleDelete(index)}
+                              onClick={() => handleDelete(index,category)}
                               disabled={editingIndex !== -1}
                             >
                               <i class="fa-solid fa-xmark"></i>
