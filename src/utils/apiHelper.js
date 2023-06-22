@@ -8,15 +8,12 @@ const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjoiNjQ3NjNmZjRmMzVh
 
 axiosClient.defaults.headers = {
   'Content-Type': 'application/json',
-  Accept: 'application/json',
   Authorization : `Bearer ${token}`,
-  'Access-Control-Allow-Origin':'*'
 };
 
 //All request will wait 2 seconds before timeout
 // axiosClient.defaults.timeout = 2000;
 
-axiosClient.defaults.withCredentials = true;
 
 export function getRequest(URL) {
   return axiosClient.get(`${URL}`).then(response => response);
