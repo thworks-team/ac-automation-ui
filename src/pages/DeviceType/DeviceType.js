@@ -3,19 +3,26 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import './DeviceType.css';
 import { getRequest, postRequest } from "../../utils/apiHelper";
+import './../../index.css'
 
 const  DeviceType = () => {
-  const [name, setName] = useState("");
+  const [name, setName] = useState(null);
   const [categories, setCategories] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      setLoading(true);
-      const response = await getRequest('/deviceType');
-      setLoading(false);
-      setCategories(response.data.data);
+      try {
+        setLoading(true);
+        const response = await getRequest('/deviceType');
+        setLoading(false);  
+        setCategories(response.data.data);
+      } catch (error) {
+        setLoading(false);
+        setError(true);
+      }
     }
     fetchData();
   },[])
@@ -64,12 +71,11 @@ const  DeviceType = () => {
     <div className="main">
       {
         loading ? 
-        <div class="text-center mt-4">
-          <span >Loading...</span>
-          <div class="spinner-border" role="status">
-          </div>
+        <div className="loaderContainer">
+          <div class="loader"></div>
         </div>
         :
+        error ? <div className="warningMessage">Something went wrong.. Please try again !!</div> :
       <div className="row">
         <div className="col-md-4">
           <div className="card m-5" style={{ width: "18rem" }}>
@@ -92,6 +98,7 @@ const  DeviceType = () => {
                   <button
                     type="submit"
                     className="btn btn-primary m-3 mx-4 px-4"
+                    disabled ={name ? false : true  }
                   >
                     {"Add" }
                   </button>

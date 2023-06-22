@@ -3,9 +3,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import './Device.css';
 import { getRequest, postRequest } from "../../utils/apiHelper";
+import './../../index.css'
 
 const Device = () => {
-  const [device, setDevice] = useState("");
   const [deviceType, setDeviceType] = useState([]);
   const [selectedDeviceType, setSelectedDeviceType] = useState(null);
   const [gateway, setGateway] = useState([]);
@@ -21,32 +21,36 @@ const Device = () => {
   const [categories, setCategories] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!loading) {
       async function fetchData() {
-        setLoading(true);
-        // const res = await Promise.all([
-        //   getRequest('/device'),
-        //   getRequest('/deviceType'),
-        //   getRequest('/deviceCategory'),
-        //   getRequest('/gateway'),
-        //   getRequest('/schedule'),
-        // ]);
-        // const data = res.map((res) => res.data.data);
-        // console.log(data.flat());
-
-        const deviceResponse = await getRequest('/device');
-        const deviceTypeResponse = await getRequest('/deviceType');
-        const deviceCategoryResponse = await getRequest('/deviceCategory');
-        const gatewayResponse = await getRequest('/gateway');
-        const scheduleResponse = await getRequest('/schedule');
-        setDeviceType(deviceTypeResponse.data.data)
-        setDeviceCategory(deviceCategoryResponse.data.data)
-        setGateway(gatewayResponse.data.data)
-        setSchedule(scheduleResponse.data.data)
-        setLoading(false);
-        setCategories(deviceResponse.data.data);
+        try {
+          setLoading(true);
+          const res = await Promise.all([
+            getRequest('/device'),
+            getRequest('/deviceType'),
+            getRequest('/deviceCategory'),
+            getRequest('/gateway'),
+            getRequest('/schedule'),
+          ]);
+          setLoading(false);
+          const data = res.map((res) => res.data.data);
+          // const deviceResponse = await getRequest('/device');
+          // const deviceTypeResponse = await getRequest('/deviceType');
+          // const deviceCategoryResponse = await getRequest('/deviceCategory');
+          // const gatewayResponse = await getRequest('/gateway');
+          // const scheduleResponse = await getRequest('/schedule');
+          setCategories(data[0]);
+          setDeviceType(data[1]);
+          setDeviceCategory(data[2]);
+          setGateway(data[3]);
+          setSchedule(data[4]);
+        } catch (error) {
+          setLoading(false);
+          setError(true);
+        }
       }
       fetchData();
     }
@@ -73,9 +77,9 @@ const Device = () => {
     } else {
       let id = categories[editingIndex]['_id'];
       setLoading(true);
-      const response = await postRequest(`/device/${id}`,data);
+      const response = await postRequest(`/device/${id}`, data);
       setLoading(false);
-      console.log(response);
+      console.log('ddd',data,response);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].deviceTypeId = selectedDeviceType;
       updatedCategories[editingIndex].gatewayId = selectedGateway;
@@ -99,13 +103,13 @@ const Device = () => {
   };
 
   const handleEdit = (index) => {
-    setSelectedDeviceType(categories[index].deviceType);
-    setSelectedGateway(categories[index].gateway);
+    setSelectedDeviceType(categories[index].deviceTypeId);
+    setSelectedGateway(categories[index].gatewayId);
     setNodeId(categories[index].nodeId);
-    setSelectedDeviceCategory(categories[index].deviceCategory);
+    setSelectedDeviceCategory(categories[index].deviceCategoryId);
     setName(categories[index].name);
     setLocation(categories[index].location);
-    setSelectedSchedule(categories[index].schedule);
+    setSelectedSchedule(categories[index].scheduleId);
     setBrandModel(categories[index].brandModel);
     // setName(categories[index].name);
     // setCity(categories[index].city);
@@ -114,9 +118,9 @@ const Device = () => {
     setEditingIndex(index);
   };
 
-  const handleDelete = async(index,category) => {
+  const handleDelete = async (index, category) => {
     setLoading(true);
-    await postRequest(`/device/delete/${category['_id']}`,{});
+    await postRequest(`/device/delete/${category['_id']}`, {});
     setLoading(false);
     const updatedCategories = categories.filter((_, i) => i !== index);
     setCategories(updatedCategories);
@@ -138,12 +142,11 @@ const Device = () => {
   return (
     <div className="main">
       {loading ?
-        <div class="text-center mt-4">
-          <span >Loading...</span>
-          <div class="spinner-border" role="status">
-          </div>
+        <div className="loaderContainer">
+          <div class="loader"></div>
         </div>
         :
+        error ? <div className="warningMessage">Something went wrong.. Please try again !!</div> :
         <div className="row">
           <div className="col-md-4">
             <div className="card m-5" style={{ width: "30rem" }}>
@@ -165,7 +168,7 @@ const Device = () => {
                     required=""
                   /> */}
                       <select class="form-select" id="city" required onChange={(e) => setSelectedDeviceType(e.target.value)}>
-                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Device Type --</option>
+                        <option selected style={{ backgroundColor: 'lightgrey' }} value={null} > -- Select Device Type --</option>
                         {deviceType?.map((item, index) => {
                           return <option value={item['_id']}>{item.name}</option>
                         })}
@@ -185,7 +188,7 @@ const Device = () => {
                     required=""
                   /> */}
                       <select class="form-select" id="city" onChange={(e) => setSelectedGateway(e.target.value)}>
-                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Gateway --</option>
+                        <option selected style={{ backgroundColor: 'lightgrey' }} value={null} > -- Select Gateway --</option>
                         {gateway?.map(item => {
                           return <option value={item['_id']}>{item.name}</option>
                         })}
@@ -219,7 +222,7 @@ const Device = () => {
                         required=""
                       /> */}
                       <select class="form-select  mt-3" id="city" onChange={(e) => setSelectedDeviceCategory(e.target.value)}>
-                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Device Category --</option>
+                        <option selected style={{ backgroundColor: 'lightgrey' }} value={null} > -- Select Device Category --</option>
                         {deviceCategory?.map(item => {
                           return <option value={item['_id']}>{item.name}</option>
                         })}
@@ -258,7 +261,7 @@ const Device = () => {
                         Schedule
                       </label>
                       <select class="form-select mt-3" id="city" required onChange={(e) => setSelectedSchedule(e.target.value)}>
-                        <option selected style={{backgroundColor: 'lightgrey'}} value={null} > -- Select Schedule -- </option>
+                        <option selected style={{ backgroundColor: 'lightgrey' }} value={null} > -- Select Schedule -- </option>
                         {schedule?.map((item, index) => {
                           return <option value={item['_id']}>{item.name}</option>
                         })}
@@ -328,8 +331,8 @@ const Device = () => {
                             })}
                           </select>
                         ) : (
-                          // deviceType.find(item => item['_id'] === category.deviceTypeId)?.name
-                          category.deviceTypeId?.name
+                          deviceType.find(item => item['_id'] === category.deviceTypeId)?.name
+                          // category.deviceTypeId?.name
                         )}
                       </td>
                       <td>
@@ -340,8 +343,8 @@ const Device = () => {
                             })}
                           </select>
                         ) : (
-                          // gateway.find(item => item['_id'] === category.gatewayId)?.name
-                          category.gatewayId?.name
+                          gateway.find(item => item['_id'] === category.gatewayId)?.name
+                          // category.gatewayId?.name
                         )}
                       </td>
                       <td>
@@ -364,8 +367,8 @@ const Device = () => {
                             })}
                           </select>
                         ) : (
-                          category.deviceCategoryId?.name
-                          // deviceCategory.find(item => item['_id'] === category.deviceCategoryId)?.name
+                          // category.deviceCategoryId?.name
+                          deviceCategory.find(item => item['_id'] === category.deviceCategoryId)?.name
                         )}
                       </td>
                       <td>
@@ -446,7 +449,7 @@ const Device = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-danger m-2"
-                              onClick={() => handleDelete(index,category)}
+                              onClick={() => handleDelete(index, category)}
                               disabled={editingIndex !== -1}
                             >
                               <i class="fa-solid fa-xmark"></i>

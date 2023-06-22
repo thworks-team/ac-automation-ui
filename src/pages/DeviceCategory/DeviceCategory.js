@@ -3,35 +3,42 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import './DeviceCategory.css';
 import { getRequest, postRequest } from "../../utils/apiHelper";
+import './../../index.css'
 
 const DeviceCategory = () => {
-  const [name, setName] = useState("");
+  const [name, setName] = useState(null);
   const [categories, setCategories] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      setLoading(true);
-      const response = await getRequest('/deviceCategory');
-      setLoading(false);
-      setCategories(response.data.data);
+      try {
+        setLoading(true);
+        const response = await getRequest('/deviceCategory');
+        setLoading(false);
+        setCategories(response.data.data);
+      } catch (error) {
+        setLoading(false);
+        setError(true);
+      }
     }
     fetchData();
-  },[])
+  }, [])
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (name.trim() === "") return; // Fail proof: don't add empty names
     if (editingIndex === -1) {
       setLoading(true);
-      const response = await postRequest('/deviceCategory',{ name: name });
+      const response = await postRequest('/deviceCategory', { name: name });
       setLoading(false);
       setCategories([...categories, response.data.data]);
     } else {
       let id = categories[editingIndex]['_id'];
       setLoading(true);
-      const response = await postRequest(`/deviceCategory/${id}`,{ name: name });
+      const response = await postRequest(`/deviceCategory/${id}`, { name: name });
       console.log(response);
       setLoading(false);
       const updatedCategories = [...categories];
@@ -47,9 +54,9 @@ const DeviceCategory = () => {
     setEditingIndex(index);
   };
 
-  const handleDelete = async(index,category) => {
+  const handleDelete = async (index, category) => {
     setLoading(true);
-    await postRequest(`/deviceCategory/delete/${category['_id']}`,{});
+    await postRequest(`/deviceCategory/delete/${category['_id']}`, {});
     setLoading(false);
     const updatedCategories = categories.filter((_, i) => i !== index);
     setCategories(updatedCategories);
@@ -62,13 +69,12 @@ const DeviceCategory = () => {
 
   return (
     <div className="main">
-       {loading ? 
-        <div class="text-center mt-4">
-          <span >Loading...</span>
-          <div class="spinner-border" role="status">
-          </div>
+      {loading ?
+        <div className="loaderContainer">
+          <div class="loader"></div>
         </div>
         :
+        error ? <div className="warningMessage">Something went wrong.. Please try again !!</div> :
         <div className="row">
           <div className="col-md-4">
             <div className="card m-5" style={{ width: "18rem" }}>
@@ -91,6 +97,7 @@ const DeviceCategory = () => {
                     <button
                       type="submit"
                       className="btn btn-primary m-3 mx-4 px-4"
+                      disabled={name ? false : true}
                     >
                       {"Add"}
                     </button>
@@ -155,7 +162,7 @@ const DeviceCategory = () => {
                             <button
                               type="button"
                               className="btn btn-sm btn-danger m-2"
-                              onClick={() => handleDelete(index,category)}
+                              onClick={() => handleDelete(index, category)}
                               disabled={editingIndex !== -1}
                             >
                               <i class="fa-solid fa-xmark"></i>
