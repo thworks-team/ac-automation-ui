@@ -306,7 +306,6 @@ const Gateway = () => {
                                                     sites.find(item => item['_id'] === category.site)?.name
                                                 )}
                                             </td> */}
-                                                {/* {console.log('sites',sites,category)} */}
                                                 <td>
                                                     {editingIndex === index ? (
                                                         <>

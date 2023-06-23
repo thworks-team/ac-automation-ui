@@ -15,7 +15,6 @@ function Login() {
   const handleLogin = async() => {
     const payload = {email, password};
     const response = postRequest('/login', payload);
-    console.log("response", response);
   }
   return (
     <div className='Auth-form-container'>

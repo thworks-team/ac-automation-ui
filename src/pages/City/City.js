@@ -37,12 +37,10 @@ const City = () => {
       const response = await postRequest('/city', { name: city, code: code });
       setLoading(false);
       setCategories([...categories, response.data.data]);
-      console.log('postRes', response)
     } else {
       let id = categories[editingIndex]['_id'];
       setLoading(true);
-      const response = await postRequest(`/city/${id}`, { name: city, code: code });
-      console.log(response);
+      await postRequest(`/city/${id}`, { name: city, code: code });
       setLoading(false);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].name = city;

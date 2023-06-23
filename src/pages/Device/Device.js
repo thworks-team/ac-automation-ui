@@ -77,9 +77,8 @@ const Device = () => {
     } else {
       let id = categories[editingIndex]['_id'];
       setLoading(true);
-      const response = await postRequest(`/device/${id}`, data);
+      await postRequest(`/device/${id}`, data);
       setLoading(false);
-      console.log('ddd',data,response);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].deviceTypeId = selectedDeviceType;
       updatedCategories[editingIndex].gatewayId = selectedGateway;

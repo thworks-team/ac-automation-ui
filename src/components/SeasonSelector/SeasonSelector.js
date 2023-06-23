@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SeasonSelector = () => {
+const SeasonSelector = ({handleSubmit,handleSelectedStatus,handleSelectedTemp}) => {
   return (
     <div className="row">
       <div className="col-sm-3 my-3">
@@ -32,6 +32,9 @@ const SeasonSelector = () => {
       </div>
       <div className="col-sm-3 my-3">
         <button type="button" className="btn btn-primary">Copy</button>
+      </div>
+      <div className="col-sm-3 my-3">
+        <button type="button" className="btn btn-success" onClick={handleSubmit}>Submit</button>
       </div>
     </div>
   )

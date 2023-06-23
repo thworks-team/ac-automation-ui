@@ -38,8 +38,7 @@ const DeviceCategory = () => {
     } else {
       let id = categories[editingIndex]['_id'];
       setLoading(true);
-      const response = await postRequest(`/deviceCategory/${id}`, { name: name });
-      console.log(response);
+      await postRequest(`/deviceCategory/${id}`, { name: name });
       setLoading(false);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].name = name;

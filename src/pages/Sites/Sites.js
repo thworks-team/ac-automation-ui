@@ -46,9 +46,8 @@ const City = () => {
     } else {
       let id = categories[editingIndex]['_id'];
       setLoading(true);
-      const response = await postRequest(`/sites/${id}`, { name: name, city: selectedCity, region: region, pincode: pincode });
+      await postRequest(`/sites/${id}`, { name: name, city: selectedCity, region: region, pincode: pincode });
       setLoading(false);
-      console.log(response);
       const updatedCategories = [...categories];
       updatedCategories[editingIndex].name = name;
       updatedCategories[editingIndex].city = selectedCity;
@@ -131,7 +130,6 @@ const City = () => {
                     placeholder="City"
                     required=""
                   /> */}
-                    {console.log(city)}
                     <select class="form-select" id="city" aria-label="Default select example" onChange={(e) => setSelectedCity(e.target.value)}>
                       <option selected style={{ backgroundColor: 'lightgrey' }} value={null} > -- Select City -- </option>
                       {city?.map(item => {

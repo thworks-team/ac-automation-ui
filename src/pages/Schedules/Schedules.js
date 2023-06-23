@@ -1,14 +1,19 @@
-import React from "react";
+import React, {useState} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import { HiTag } from 'react-icons/hi';
+// import { HiTag } from 'react-icons/hi';
 
 import Season from "../../components/Season/Season";
 import './Schedules.css';
 
 const Schedules = () => {
+
+  const [displaySeason,setDisplaySeason] = useState(false);
+  const [season,setSeason] = useState('Season1');
+  const [seasonName,setSeasonName] = useState('');
+  const [seasonLevelData,setSeasonLevelData] = useState({});
 
   return (
     <div className="main">
@@ -19,49 +24,27 @@ const Schedules = () => {
             <div className="m-5 col-sm-4">
               <label for="basic-url" className="form-label">Name</label>
               <div className="input-group">
-                <input type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4" placeholder="Name" />
-                <span className="input-group-text" id="basic-addon3"><HiTag /></span>
+                <input type="text" className="form-control" onChange={ev => setSeasonName(ev.target.value)} id="basic-url" aria-describedby="basic-addon3 basic-addon4" placeholder="Name" />
+                {/* <span className="input-group-text" id="basic-addon3"><HiTag /></span> */}
+                <button className="btn btn-primary" onClick={() => setDisplaySeason(true)}>Proceed</button>
               </div>
             </div>
-            <div>
+            {displaySeason ? <div>
               <Tabs
-                defaultActiveKey="city"
+                // defaultActiveKey="city"
                 id="justify-tab-example"
                 className="mb-3"
                 justify
+                onSelect={(val) => setSeason(val)}
+                activeKey={season}
               >
-                <Tab eventKey="Season1" title="Season1">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season2" title="Season2">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season3" title="Season3">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season4" title="Season4">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season5" title="Season5">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season6" title="Season6">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season7" title="Season7">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season8" title="Season8">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season9" title="Season9">
-                  <Season />
-                </Tab>
-                <Tab eventKey="Season10" title="Season10">
-                  <Season />
-                </Tab>
+                {[1,2,3,4,5,6,7,8,9,10].map((item,index) => {
+                  return <Tab eventKey={`Season${item}`} title={`Season${item}`}>
+                    <Season season={season} seasonName={seasonName} seasonNum={item} seasonLevelData={seasonLevelData} setSeasonLevelData={setSeasonLevelData}/>
+                  </Tab>
+                })}
               </Tabs>
-            </div>
+            </div> : null}
           </div>
         </div>
       </div>
