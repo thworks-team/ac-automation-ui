@@ -1,7 +1,5 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AddCategory from "./pages/DeviceCategory/DeviceCategory";
-import AddDevice from "./pages/DeviceType/DeviceType";
 import Header from "./components/Header/Header";
 
 import City from './pages/City/City';
