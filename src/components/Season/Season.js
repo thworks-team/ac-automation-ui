@@ -1,4 +1,4 @@
-import React , {forwardRef, useState} from 'react'
+import React , {forwardRef, useEffect, useState} from 'react'
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { VscCalendar } from 'react-icons/vsc';
@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import './index.css';
 import { postRequest } from '../../utils/apiHelper';
 
-const Season = ({season,seasonName,seasonNum,seasonLevelData,setSeasonLevelData}) => {
+const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLevelData,setLoading,seasonData}) => {
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
   const [selectedStartTime, setSelectedStartTime] = useState({});
@@ -18,9 +18,35 @@ const Season = ({season,seasonName,seasonNum,seasonLevelData,setSeasonLevelData}
   const [selectedTemp, setSelectedTemp] = useState({});
   const [selectedStatus, setSelectedStatus] = useState({});
   const [selectedOptionCheck, setSelectedOptionCheck] = useState({});
+  const [localScheduleTimings, setLocalScheduleTimings] = useState({
+    "Sunday": [1],
+    "Monday": [1],
+    "Tuesday": [1],
+    "Wednesday": [1],
+    "Thursday": [1],
+    "Friday": [1],
+    "Saturday": [1]
+  });
 
   const [day, setDay] = useState('Sunday');
   const [dayLevelData, setDayLevelData] = useState({});
+
+  useEffect(() => {
+    if(seasonData?.fromDate){
+      if(seasonData.fromDate){
+        let date = new Date(seasonData.fromDate);
+        setSelectedFromDate(date)
+      }
+    }
+
+    if(seasonData?.toDate){
+      if(seasonData.toDate){
+        let date = new Date(seasonData.toDate);
+        setSelectedToDate(date);
+      }
+    }
+  }, [seasonData])
+  
 
   const handleSelectedTime = (time,value,index) => {
     if(time === "startTime"){
@@ -144,28 +170,45 @@ const Season = ({season,seasonName,seasonNum,seasonLevelData,setSeasonLevelData}
 
   const handleDaySubmit = async() => {
     let scheduleTiming = [];
-    if(dayLevelData[day]?.scheduleTiming){
-      Object.keys(dayLevelData[day]?.scheduleTiming).each((key) => {
-        let obj = dayLevelData[day]?.scheduleTiming[key];
-        if(obj.enable){
-          scheduleTiming.push(obj)
+    if(dayLevelData){
+      Object.keys(dayLevelData).map(item => {
+        let dayScheduleTiming = [];
+        if(dayLevelData[item]?.scheduleTiming){
+          Object.keys(dayLevelData[item].scheduleTiming).map(key => {
+            let obj = dayLevelData[item].scheduleTiming[key];
+            if(obj.enable){
+              dayScheduleTiming.push(obj)
+            }
+          })
         }
+        scheduleTiming.push({day:item,scheduleTiming:dayScheduleTiming})
       })
     }
     let data = {
-      "name": seasonName,
+      "name": selectedSchedule.name,
       "season": seasonNum,
       "fromDate": handleDataFormat(selectedFromDate),
       "toDate": handleDataFormat(selectedToDate),
       "day": day,   
       "scheduleTiming": scheduleTiming
     } 
+    setLoading(true);
     const response = await postRequest(`/schedule`, data);
+    setLoading(false);
     setSeasonLevelData({[season]: {
       ...seasonLevelData[season],
       [day]: response.data.data
     }})
     alert('Schedule Data saved successfully !!');
+  }
+
+  const handleAddLocalRow = () => {
+    let arr = [...localScheduleTimings[day]]
+    arr.push(localScheduleTimings[day].length + 1);
+    setLocalScheduleTimings({
+      ...localScheduleTimings,
+      [day]: arr
+    })
   }
 
   return (
@@ -212,10 +255,15 @@ const Season = ({season,seasonName,seasonNum,seasonLevelData,setSeasonLevelData}
           activeKey={day}
         >
           {["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"].map((item,index) => {
+            let dayData = seasonData?.scheduleTiming?.find(val => {
+              return val?.day?.toLowerCase() === item.toLowerCase()
+            });
+            const localScheduleTimingsDayLevel = localScheduleTimings[item];
+            let scheduleTimingsArray = dayData?.scheduleTiming ? [...dayData.scheduleTiming,...localScheduleTimingsDayLevel] : localScheduleTimingsDayLevel;
             return <Tab eventKey={item} title={item}>
               <SeasonSelector handleSubmit={handleDaySubmit}/> 
               <div>
-                {[1,2,3].map((timePicker,index) => {
+                {scheduleTimingsArray.map((timePicker,index) => {
                   return <TimePicker 
                             day={day}
                             index={index} 
@@ -227,14 +275,21 @@ const Season = ({season,seasonName,seasonNum,seasonLevelData,setSeasonLevelData}
                             selectedStartTime={selectedStartTime}
                             selectedFromDate={selectedFromDate}
                             selectedToDate={selectedToDate}
-                            dayLevelData={dayLevelData}
+                            timePickerData={timePicker}
+                            dayLevelData={scheduleTimingsArray}
                             handleSelectedOptionCheck={handleSelectedOptionCheck}
+                            setLocalScheduleTimings={setLocalScheduleTimings}
+                            localScheduleTimings={localScheduleTimings}
+                            addLocalRow={handleAddLocalRow}
                         />
                 })}
               </div>
             </Tab>
           })}
         </Tabs>
+        <div className="my-3 submitButtonContainer">
+          <button type="button" className="btn btn-primary" onClick={handleDaySubmit}>Submit</button>
+        </div>
       </div>
     </div>
   )

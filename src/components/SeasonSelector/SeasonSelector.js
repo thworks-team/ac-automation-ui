@@ -33,9 +33,9 @@ const SeasonSelector = ({handleSubmit,handleSelectedStatus,handleSelectedTemp}) 
       <div className="col-sm-3 my-3">
         <button type="button" className="btn btn-primary">Copy</button>
       </div>
-      <div className="col-sm-3 my-3">
+      {/* <div className="col-sm-3 my-3">
         <button type="button" className="btn btn-success" onClick={handleSubmit}>Submit</button>
-      </div>
+      </div> */}
     </div>
   )
 }

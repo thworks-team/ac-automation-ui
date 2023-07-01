@@ -139,7 +139,7 @@ const Device = () => {
   }
 
   return (
-    <div className="main">
+    <div className="main" style={{overflow: 'hidden'}}>
       {loading ?
         <div className="loaderContainer">
           <div class="loader"></div>
@@ -148,7 +148,7 @@ const Device = () => {
         error ? <div className="warningMessage">Something went wrong.. Please try again !!</div> :
         <div className="row">
           <div className="col-md-4">
-            <div className="card m-5" style={{ width: "30rem" }}>
+            <div className="card mt-5" style={{ marginLeft: '30px' }}>
               <div className="card-header">Add Device</div>
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
@@ -304,7 +304,7 @@ const Device = () => {
             </div>
           </div>
           <div className="col-md-8">
-            <div className="card m-5">
+            <div className="card mt-5" >
               <div className="card-header">Device List</div>
               <table className="table table-bordered">
                 <thead>
