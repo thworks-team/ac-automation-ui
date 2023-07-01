@@ -54,7 +54,7 @@ const Device = () => {
       }
       fetchData();
     }
-  }, [])
+  }, [loading])
 
   const handleSubmit = async (e) => {
     e.preventDefault();

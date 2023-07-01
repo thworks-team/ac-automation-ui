@@ -12,7 +12,7 @@ function Header() {
     alert('Logout');
   }
   const authButton = () => {
-    if (null === null) {
+    if (null) {
         return (
             <ButtonGroup>
                 <Button variant="primary" as={Link} to="/login">Login</Button>

@@ -145,7 +145,7 @@ const Season = ({season,seasonName,seasonNum,seasonLevelData,setSeasonLevelData}
   const handleDaySubmit = async() => {
     let scheduleTiming = [];
     if(dayLevelData[day]?.scheduleTiming){
-      Object.keys(dayLevelData[day]?.scheduleTiming).map(key => {
+      Object.keys(dayLevelData[day]?.scheduleTiming).each((key) => {
         let obj = dayLevelData[day]?.scheduleTiming[key];
         if(obj.enable){
           scheduleTiming.push(obj)
