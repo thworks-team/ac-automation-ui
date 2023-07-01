@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const axiosClient = axios.create();
 
-axiosClient.defaults.baseURL = 'https://api-sensor.thworks.org/api/v1';
+axiosClient.defaults.baseURL = 'https://api-sensor.thworks.org/api/v1/';
 
 const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoIjoiNjQ3NjNmZjRmMzVhZjM2ODhmNmJjNmU2IiwiaWF0IjoxNjg1NDcxMjc5LCJleHAiOjE2ODU1MjUyNzl9.7jH__nsQ1EZgYieUl79VXjVoP0vKtaFpJ8joKm0WXyY';
 

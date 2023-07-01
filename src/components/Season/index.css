@@ -10,3 +10,8 @@
 .reactDatePickerWrapper{
     width: 30%;
 }
+
+.submitButtonContainer{
+    display: flex;
+    justify-content: end;
+}

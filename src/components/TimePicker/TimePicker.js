@@ -1,22 +1,31 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
+import { TimePicker } from "react-ios-time-picker";
+import './index.css'
 
+const TimePickerComponent = (
+  {
+    day,
+    dayLevelData,
+    timePickerData,
+    handleSelectedTime,
+    handleSelectedTemp,
+    handleSelectedStatus,
+    index,
+    handleSelectedOptionCheck,
+    setLocalScheduleTimings,
+    localScheduleTimings,
+    addLocalRow
+  }) => {
 
-const TimePicker = ({day,dayLevelData,handleSelectedTime,handleSelectedTemp,handleSelectedStatus,index,handleSelectedOptionCheck}) => {
+  const [selectedTemp, setSelectedTemp] = useState(timePickerData?.temperature ? timePickerData.temperature : 0);
 
-  useEffect(() => {
-    setSelectedTemp(null)
-  }, [day])
-  
-
-  const [selectedTemp, setSelectedTemp] = useState(null);
-
-  const handleStartTime = () => {
-    let startTime = document.getElementById('startTime').value;
+  const handleStartTime = (startTime) => {
+    // let startTime = document.getElementById('startTime').value;
     handleSelectedTime('startTime',startTime,index)
   }
 
-  const handleEndTime = () => {
-    let endTime = document.getElementById('endTime').value;
+  const handleEndTime = (endTime) => {
+    // let endTime = document.getElementById('endTime').value;
     handleSelectedTime('endTime',endTime,index)
   }
 
@@ -34,41 +43,59 @@ const TimePicker = ({day,dayLevelData,handleSelectedTime,handleSelectedTemp,hand
     handleSelectedOptionCheck(value,index)
   }
 
+  const {startTime,endTime,status,enable} = timePickerData;
+
+
   return (
-    <div>
-      {/* {console.log((dayLevelData && dayLevelData[day] && dayLevelData[day]['scheduleTiming'][index]) ? dayLevelData[day]['scheduleTiming'][index].startTime : null)} */}
-      <div className="row m-1 d-flex justify-content-between">
-        <div className="form-check m-2 col-sm-1 w-5">
-          <input className="form-check-input position-relative top-50 start-50" type="checkbox" value="" id="flexCheckDefault" onChange={(e) => handleOptionCheck(e.target.checked)} />
+    <div className='d-flex'>
+      <div className="row m-1 col-12 d-flex justify-content-between">
+        <div className="form-check col-sm-1">
+          <input className="form-check-input position-relative top-50 start-50" type="checkbox" value="" id="flexCheckDefault" checked={enable} onChange={(e) => handleOptionCheck(e.target.checked)} />
         </div>
-        <div className="m-2 col-sm-2">
+        <div className="col-sm-2">
           <label for="basic-url" className="form-label">Start Time</label>
           <div className="input-group">
-            <input type="time" className="form-control" id="startTime" value={(dayLevelData && dayLevelData[day] && dayLevelData[day]['scheduleTiming'][index]) ? dayLevelData[day]['scheduleTiming'][index].startTime : null} aria-describedby="basic-addon3 basic-addon4"  onChange={handleStartTime} />
+            <TimePicker
+              value={startTime ? startTime : "00:00"}
+              theme="Bourbon"
+              className="timepicker"
+              placeholder="Start Time"
+              onSave={handleStartTime}
+            />
             {/* <span className="input-group-text" id="basic-addon3"><AiOutlineClockCircle /></span> */}
           </div>
         </div>
-        <div className="m-2 col-sm-2">
+        <div className="col-sm-2">
           <label for="basic-url" className="form-label">End Time</label>
           <div className="input-group">
-            <input type="time" className="form-control" id="endTime" aria-describedby="basic-addon3 basic-addon4"  onChange={handleEndTime} />
+            {/* <input type="time" className="form-control" id="endTime" aria-describedby="basic-addon3 basic-addon4"  onChange={handleEndTime} /> */}
+            <TimePicker
+              value={endTime ? endTime : "00:00"}
+              // theme="Bourbon"
+              className="timepicker"
+              placeholder="End Time"
+              onSave={handleEndTime}
+            />
             {/* <span className="input-group-text" id="basic-addon3"><AiOutlineClockCircle /></span> */}
           </div>
         </div>
-        <div className="form-check form-switch m-2 col-sm-1">
-          <input className="form-check-input position-relative top-50 start-10" type="checkbox" onChange={(ev) => handleOnOff(ev)}role="switch" id="flexSwitchCheckDefault" />
-          <label className="form-check-label position-relative top-50 start-10" for="flexSwitchCheckDefault">ON/OFF</label>
+        <div className="form-check form-switch col-sm-1">
+          <input className="form-check-input position-relative top-50 start-10" type="checkbox" onChange={(ev) => handleOnOff(ev)} role="switch" id="statusSwitch" />
+          <label className="form-check-label position-relative top-50 start-10" for="statusSwitch">ON/OFF</label>
         </div>
-        <div className="m-2 col-sm-4">
+        <div className="col-sm-4">
           <label for="customRange2" className="form-label">Temperature</label>
           <div className='d-flex'>
-            <input type="range" className="form-range" min="18" max="50" id="customRange2" onChange={(ev) => handleRangeSelector(ev)}></input>
+            <input type="range" className="form-range" min="18" max="50" value={selectedTemp} id="customRange2" onChange={(ev) => handleRangeSelector(ev)}></input>
             <span style={{marginLeft:'1rem',fontWeight:'bolder'}}>{selectedTemp}</span>
           </div>
         </div>
       </div>
+      {(index === dayLevelData.length - 1) && <div className="col-sm-1" style={{alignSelf: 'center'}}>
+        <button className='btn btn-success' onClick={addLocalRow}>Add</button>
+      </div>}
     </div>
   )
 }
 
-export default TimePicker
+export default TimePickerComponent
