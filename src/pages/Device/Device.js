@@ -35,18 +35,25 @@ const Device = () => {
             getRequest('/gateway'),
             getRequest('/schedule'),
           ]);
-          setLoading(false);
-          const data = res.map((res) => res.data.data);
           // const deviceResponse = await getRequest('/device');
           // const deviceTypeResponse = await getRequest('/deviceType');
           // const deviceCategoryResponse = await getRequest('/deviceCategory');
           // const gatewayResponse = await getRequest('/gateway');
           // const scheduleResponse = await getRequest('/schedule');
+          setLoading(false);
+          const data = res.map((res) => res.data.data);
+
           setCategories(data[0]);
           setDeviceType(data[1]);
           setDeviceCategory(data[2]);
           setGateway(data[3]);
           setSchedule(data[4]);
+
+          // setCategories(deviceResponse.data.data);
+          // setDeviceType(deviceTypeResponse.data.data);
+          // setDeviceCategory(deviceCategoryResponse.data.data);
+          // setGateway(gatewayResponse.data.data);
+          // setSchedule(scheduleResponse.data.data);
         } catch (error) {
           setLoading(false);
           setError(true);
@@ -54,7 +61,7 @@ const Device = () => {
       }
       fetchData();
     }
-  }, [loading])
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
