@@ -43,7 +43,7 @@ const TimePickerComponent = (
     handleSelectedOptionCheck(value,index)
   }
 
-  const {startTime,endTime,status,enable} = timePickerData;
+  const {startTime,endTime,enable} = timePickerData;
 
 
   return (
