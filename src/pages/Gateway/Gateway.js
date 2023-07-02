@@ -112,7 +112,7 @@ const Gateway = () => {
                     error ? <div className="warningMessage">Something went wrong.. Please try again !!</div> :
                     <div className="row">
                         <div className="col-md-4">
-                            <div className="card m-5" style={{ width: "30rem" }}>
+                            <div className="card m-3" style={{ width: "30rem" }}>
                                 <div className="card-header">Add Gateway</div>
                                 <div className="card-body">
                                     <form onSubmit={handleSubmit}>
@@ -220,8 +220,8 @@ const Gateway = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-8">
-                            <div className="card m-5">
+                        <div className="col-md-7" style={{marginLeft:'5rem',minWidth: 'min-content'}}>
+                            <div className="card m-3">
                                 <div className="card-header">Gateway Devices</div>
                                 <table className="table table-bordered">
                                     <thead>
