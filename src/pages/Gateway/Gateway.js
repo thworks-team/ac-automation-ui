@@ -48,8 +48,7 @@ const Gateway = () => {
         } else {
             let id = categories[editingIndex]['_id'];
             setLoading(true);
-            const response = await postRequest(`/gateway/${id}`, { name: name, code: code, mac: mac, imei: imei, gatewayType: gateway });
-            console.log(response);
+            await postRequest(`/gateway/${id}`, { name: name, code: code, mac: mac, imei: imei, gatewayType: gateway });
             setLoading(false);
             const updatedCategories = [...categories];
             updatedCategories[editingIndex].name = name;

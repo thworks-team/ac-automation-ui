@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { TimePicker } from "react-ios-time-picker";
 import './index.css'
 
@@ -18,6 +18,16 @@ const TimePickerComponent = (
   }) => {
 
   const [selectedTemp, setSelectedTemp] = useState(timePickerData?.temperature ? timePickerData.temperature : 0);
+  const [selectedStatus, setSelectedStatus] = useState('off');
+
+  useEffect(() => {
+    if(timePickerData?.status){
+      setSelectedStatus('on');
+    }else{
+      setSelectedStatus('off');
+    }
+  }, [timePickerData])
+  
 
   const handleStartTime = (startTime) => {
     // let startTime = document.getElementById('startTime').value;
@@ -35,6 +45,8 @@ const TimePickerComponent = (
   }
 
   const handleOnOff = ev => {
+    let value = ev.target.checked ? 'ON' : 'OFF';
+    setSelectedStatus(value)
     handleSelectedStatus(ev.target.checked,index)
   }
 
@@ -43,14 +55,14 @@ const TimePickerComponent = (
     handleSelectedOptionCheck(value,index)
   }
 
-  const {startTime,endTime,enable} = timePickerData;
+  const {startTime,endTime} = timePickerData;
 
 
   return (
     <div className='d-flex'>
       <div className="row m-1 col-12 d-flex justify-content-between">
         <div className="form-check col-sm-1">
-          <input className="form-check-input position-relative top-50 start-50" type="checkbox" value="" id="flexCheckDefault" checked={enable} onChange={(e) => handleOptionCheck(e.target.checked)} />
+          <input className="form-check-input position-relative top-50 start-50" type="checkbox" value="" id="flexCheckDefault" checked={true} onChange={(e) => handleOptionCheck(e.target.checked)} />
         </div>
         <div className="col-sm-2">
           <label for="basic-url" className="form-label">Start Time</label>
@@ -80,7 +92,7 @@ const TimePickerComponent = (
           </div>
         </div>
         <div className="form-check form-switch col-sm-1">
-          <input className="form-check-input position-relative top-50 start-10" type="checkbox" onChange={(ev) => handleOnOff(ev)} role="switch" id="statusSwitch" />
+          <input className="form-check-input position-relative top-50 start-10" value={selectedStatus === 'on' ? true : false} checked={true} type="checkbox" onChange={(ev) => {handleOnOff(ev)}} role="switch" id="statusSwitch" />
           <label className="form-check-label position-relative top-50 start-10" for="statusSwitch">ON/OFF</label>
         </div>
         <div className="col-sm-4">

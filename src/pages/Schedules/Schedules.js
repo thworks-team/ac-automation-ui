@@ -3,8 +3,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-// import { HiTag } from 'react-icons/hi';
-
 import Season from "../../components/Season/Season";
 import './Schedules.css';
 import { getRequest } from "../../utils/apiHelper";

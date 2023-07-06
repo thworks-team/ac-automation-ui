@@ -46,17 +46,40 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
       }
     }
   }, [seasonData])
-  
 
+  useEffect(() => {
+    if(seasonData?.scheduleTiming){
+      let dayData = {};
+      seasonData?.scheduleTiming.forEach((item,index) => {
+        if(item.scheduleTiming && item.scheduleTiming !== []){
+          let localData = {};
+          item.scheduleTiming.forEach((val,index) => {
+            localData[index] = val;
+          })
+          if(localData && localData !== {}){
+            dayData[item.day] = {...item,'scheduleTiming':localData};
+          }
+        } 
+      })
+      setDayLevelData(dayData);
+    }
+  },[])
+  
   const handleSelectedTime = (time,value,index) => {
     if(time === "startTime"){
       setSelectedStartTime({...selectedStartTime,[day]:{...selectedStartTime[day],[index]:value}});
       let scheduleTiming =  (dayLevelData[day] && dayLevelData[day]['scheduleTiming']) ? {...dayLevelData[day]['scheduleTiming']} : [];
+      // let scheduleTiming =  (dayLevelData[day] && dayLevelData[day]['scheduleTiming']) ? dayLevelData[day]['scheduleTiming'] : [];
 
       scheduleTiming[index] = {
         ...scheduleTiming[index],
         'startTime':value
       };
+
+      // scheduleTiming.splice(index, 0, {
+      //   ...scheduleTiming[index],
+      //   'startTime':value
+      // });
 
       let data = {
         ...dayLevelData,
@@ -74,6 +97,11 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
         ...scheduleTiming[index],
         'endTime':value
       };
+
+      // scheduleTiming.splice(index, 0, {
+      //   ...scheduleTiming[index],
+      //   'endTime':value
+      // });
 
       let data = {
         ...dayLevelData,
@@ -176,22 +204,30 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
         if(dayLevelData[item]?.scheduleTiming){
           Object.keys(dayLevelData[item].scheduleTiming).forEach(key => {
             let obj = dayLevelData[item].scheduleTiming[key];
-            if(obj.enable){
-              dayScheduleTiming.push(obj)
-            }
+            dayScheduleTiming.push(obj)
+            // if(obj.enable){
+            // }
           })
         }
-        scheduleTiming.push({day:item,scheduleTiming:dayScheduleTiming})
+        scheduleTiming.push({...dayLevelData[item],scheduleTiming:dayScheduleTiming})
       })
     }
-    let data = {
-      "name": selectedSchedule.name,
-      "season": seasonNum,
-      "fromDate": handleDataFormat(selectedFromDate),
-      "toDate": handleDataFormat(selectedToDate),
-      "day": day,   
-      "scheduleTiming": scheduleTiming
-    } 
+    let data = {};
+    if(seasonData['_id']){
+      data = {
+        ...seasonData,
+        "scheduleTiming": scheduleTiming
+      }
+    }else{
+      data = {
+        "name": selectedSchedule.name,
+        "season": seasonNum,
+        "fromDate": handleDataFormat(selectedFromDate),
+        "toDate": handleDataFormat(selectedToDate),
+        "day": day,   
+        "scheduleTiming": scheduleTiming
+      } 
+    }
     setLoading(true);
     const response = await postRequest(`/schedule`, data);
     setLoading(false);
