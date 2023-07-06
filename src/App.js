@@ -18,7 +18,7 @@ export default function App() {
     <BrowserRouter>
     <Header/>
       <Routes>
-        <Route path="/" element={<Schedules />}/>
+        <Route path="/" element={<Device />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/schedules" element={<Schedules />}/>
         <Route path="/city" element={<City />}/>
