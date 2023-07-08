@@ -34,6 +34,17 @@ const Schedules = () => {
 
   }, [])
 
+  const updateScheduleList = (operation,data) => {
+    if(operation === 'update'){
+      let dupScheduleList = {...scheduleList};
+      let index = scheduleList.findIndex(item => item['_id'] === data['_id']);
+      dupScheduleList[index] = data;
+      setScheduleList(dupScheduleList);
+    }else{
+      setScheduleList([...scheduleList,data]);
+    }
+  }
+
   return (
     <div className="main">
       {
@@ -87,6 +98,7 @@ const Schedules = () => {
                         setSeasonLevelData={setSeasonLevelData} 
                         setLoading={setLoading}
                         selectedSchedule = {selectedSchedule ? selectedSchedule : {name:scheduleName,value:null}}
+                        updateScheduleList={updateScheduleList}
                       />
                     </Tab>
                   })}
