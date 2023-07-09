@@ -64,6 +64,17 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
       setDayLevelData(dayData);
     }
   },[seasonData])
+
+  useEffect(() => {
+    setSelectedFromDate(null);
+    setSelectedToDate(null);
+    setSelectedStartTime({});
+    setSelectedEndTime({});
+    setSelectedTemp({});
+    setSelectedStatus({});
+    setSelectedOptionCheck({});
+  }, [selectedSchedule])
+  
   const handleSelectedTime = (time,value,index) => {
     if(time === "startTime"){
       setSelectedStartTime({...selectedStartTime,[day]:{...selectedStartTime[day],[index]:value}});
@@ -139,7 +150,7 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
 
     scheduleTiming[index] = {
       ...scheduleTiming[index],
-      'status':val ? 'on' : 'off'
+      'status': val ? 'on' : 'off'
     };
 
     let data = {
@@ -203,9 +214,13 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
         if(dayLevelData[item]?.scheduleTiming){
           Object.keys(dayLevelData[item].scheduleTiming).forEach(key => {
             let obj = dayLevelData[item].scheduleTiming[key];
+            if(!obj.enable){
+              obj.enable = true;
+            }
+            if(!obj.status){
+              obj.status = 'on';
+            }
             dayScheduleTiming.push(obj);
-            // if(obj.enable){
-            // }
           })
         }
         if(seasonData && seasonData['_id']){
@@ -258,6 +273,14 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
       ...localScheduleTimings,
       [day]: arr
     })
+  }
+
+  const handleSubmitValidation = () => {
+    let disable = true;
+    if(selectedFromDate && selectedToDate){
+      disable = false;
+    }
+    return disable;
   }
 
   return (
@@ -337,7 +360,7 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
           })}
         </Tabs>
         <div className="my-3 submitButtonContainer">
-          <button type="button" className="btn btn-primary" onClick={handleDaySubmit}>Submit</button>
+          <button type="button" className="btn btn-primary" disabled={handleSubmitValidation()} onClick={handleDaySubmit}>Submit</button>
         </div>
       </div>
     </div>
