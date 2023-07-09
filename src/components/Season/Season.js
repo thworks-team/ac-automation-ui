@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import './index.css';
 import { postRequest } from '../../utils/apiHelper';
 
-const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLevelData,setLoading,seasonData}) => {
+const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLevelData,setLoading,seasonData,updateScheduleList}) => {
   const [selectedFromDate, setSelectedFromDate] = useState(null);
   const [selectedToDate, setSelectedToDate] = useState(null);
   const [selectedStartTime, setSelectedStartTime] = useState({});
@@ -63,8 +63,7 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
       })
       setDayLevelData(dayData);
     }
-  },[seasonData?.scheduleTiming])
-  
+  },[seasonData])
   const handleSelectedTime = (time,value,index) => {
     if(time === "startTime"){
       setSelectedStartTime({...selectedStartTime,[day]:{...selectedStartTime[day],[index]:value}});
@@ -204,20 +203,31 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
         if(dayLevelData[item]?.scheduleTiming){
           Object.keys(dayLevelData[item].scheduleTiming).forEach(key => {
             let obj = dayLevelData[item].scheduleTiming[key];
-            dayScheduleTiming.push(obj)
+            dayScheduleTiming.push(obj);
             // if(obj.enable){
             // }
           })
         }
-        scheduleTiming.push({...dayLevelData[item],scheduleTiming:dayScheduleTiming})
+        if(seasonData && seasonData['_id']){
+          scheduleTiming.push({...dayLevelData[item],scheduleTiming:dayScheduleTiming})
+        }else{
+          scheduleTiming.push({day:item,scheduleTiming:dayScheduleTiming})
+        }
       })
     }
     let data = {};
-    if(seasonData['_id']){
+    let response = {};
+    if(seasonData && seasonData['_id']){
       data = {
         ...seasonData,
-        "scheduleTiming": scheduleTiming
+        "scheduleTiming": scheduleTiming,
+        "fromDate": handleDataFormat(new Date(seasonData.fromDate)),
+        "toDate": handleDataFormat(new Date(seasonData.toDate))
       }
+      setLoading(true);
+      response = await postRequest(`/schedule?id=${seasonData['_id']}`, data);
+      updateScheduleList('update',response.data.data);
+      setLoading(false);
     }else{
       data = {
         "name": selectedSchedule.name,
@@ -227,14 +237,17 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
         "day": day,   
         "scheduleTiming": scheduleTiming
       } 
+      setLoading(true);
+      response = await postRequest(`/schedule`, data);
+      updateScheduleList('create',response.data.data);
+      setLoading(false);
     }
     setLoading(true);
-    const response = await postRequest(`/schedule`, data);
     setLoading(false);
-    setSeasonLevelData({[season]: {
-      ...seasonLevelData[season],
-      [day]: response.data.data
-    }})
+    // setSeasonLevelData({[season]: {
+    //   ...seasonLevelData[season],
+    //   [day]: response.data.data
+    // }})
     alert('Schedule Data saved successfully !!');
   }
 
