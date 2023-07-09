@@ -64,7 +64,6 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
       setDayLevelData(dayData);
     }
   },[seasonData])
-
   const handleSelectedTime = (time,value,index) => {
     if(time === "startTime"){
       setSelectedStartTime({...selectedStartTime,[day]:{...selectedStartTime[day],[index]:value}});
