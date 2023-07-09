@@ -61,7 +61,10 @@ const Schedules = () => {
               <div className="m-5 col-sm-5">
                 <label for="basic-url" className="form-label">Name</label>
                 <div className="input-group">
-                  <select class="form-select" id="schedule" aria-label="Default select example" onChange={(e) => setSelectedSchedule(JSON.parse(e.target.value))}>
+                  <select class="form-select" id="schedule" aria-label="Default select example" onChange={(e) => {
+                    setSelectedSchedule(JSON.parse(e.target.value));
+                    setDisplaySeason(false);
+                    }}>
                       <option selected style={{ backgroundColor: 'lightgrey' }} value={null} > -- Select Schedule -- </option>
                       {scheduleList?.map(item => {
                         return <option value={JSON.stringify(item)}>{item.name}</option>
@@ -74,7 +77,7 @@ const Schedules = () => {
                       document.getElementById('schedule').value = '-- Select Schedule --';
                     }
                   }} placeholder="Create Schedule" />
-                  <button className="btn btn-primary" onClick={() => setDisplaySeason(true)}>Proceed</button>
+                  <button className="btn btn-primary" disabled={!(selectedSchedule || scheduleName )} onClick={() => setDisplaySeason(true)}>Proceed</button>
                 </div>
               </div>
               {displaySeason ? <div>
