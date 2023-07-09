@@ -30,6 +30,8 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
 
   const [day, setDay] = useState('Sunday');
   const [dayLevelData, setDayLevelData] = useState({});
+  const [selectCopySeason, setSelectCopySeason] = useState(null);
+  const [selectCopyDay, setSelectCopyDay] = useState(null);
 
   useEffect(() => {
     if(seasonData?.fromDate){
@@ -283,6 +285,19 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
     return disable;
   }
 
+  const handleCopy  = () => {
+    if(selectedSchedule && selectCopySeason && selectCopyDay){
+      let dayScheduleTiming = [];
+      let seasonScheduleTiming = selectedSchedule.seasons.find(item => item.season === selectCopySeason);
+      seasonScheduleTiming?.scheduleTiming.forEach(item => {
+        if(item.day === selectCopyDay){
+          dayScheduleTiming.push(...item.scheduleTiming);
+        }
+      })
+      setDayLevelData({...dayLevelData,[day]:dayScheduleTiming})
+    }
+  }
+
   return (
     <div>
       <div className="row">
@@ -333,7 +348,7 @@ const Season = ({season,selectedSchedule,seasonNum,seasonLevelData,setSeasonLeve
             const localScheduleTimingsDayLevel = localScheduleTimings[item];
             let scheduleTimingsArray = dayData?.scheduleTiming ? [...dayData.scheduleTiming,...localScheduleTimingsDayLevel] : localScheduleTimingsDayLevel;
             return <Tab eventKey={item} title={item}>
-              <SeasonSelector handleSubmit={handleDaySubmit}/> 
+              <SeasonSelector setSelectCopySeason={setSelectCopySeason} setSelectCopyDay={setSelectCopyDay} handleCopy={handleCopy}/> 
               <div>
                 {scheduleTimingsArray.map((timePicker,index) => {
                   return <TimePicker 
