@@ -12,7 +12,7 @@ const Schedules = () => {
   const [displaySeason,setDisplaySeason] = useState(false);
   const [season,setSeason] = useState('Season1');
   const [scheduleList,setScheduleList] = useState([]);
-  const [fetchScheduleList,setFetchScheduleList] = useState([]);
+  const [fetchScheduleList,setFetchScheduleList] = useState(true);
   const [scheduleName,setScheduleName] = useState('');
   const [selectedSchedule,setSelectedSchedule] = useState('');
   const [seasonLevelData,setSeasonLevelData] = useState({});
@@ -40,9 +40,11 @@ const Schedules = () => {
       let dupScheduleList = {...scheduleList};
       let index = scheduleList.findIndex(item => item['_id'] === data['_id']);
       dupScheduleList[index] = data;
-      setFetchScheduleList([...dupScheduleList]);
+      setFetchScheduleList(!fetchScheduleList);
+      setDisplaySeason(false);
     }else{
-      setFetchScheduleList([...scheduleList,data]);
+      setFetchScheduleList(!fetchScheduleList);
+      setDisplaySeason(false);
     }
   }
 
